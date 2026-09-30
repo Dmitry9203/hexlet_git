@@ -4,3 +4,23 @@ node_modules/
 dist/
 build/
 *.exe
+
+# macOS
+.DS_Store
+.Trash/
+Library/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# IDE
+.vscode/
+.idea/
+
+# Прочее
+*.log
+.env
+EOF
