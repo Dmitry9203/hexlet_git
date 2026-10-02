@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Конструктор визиток</title>
+<style>
+    * { box-sizing: border-box; }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: #eef1f6;
+        color: #1a202c;
+        min-height: 100vh;
+        line-height: 1.5;
+    }
+
+    header {
+        background: #fff;
+        padding: 18px 32px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    header h1 { font-size: 20px; }
+
+    .layout {
+        display: grid;
+        grid-template-columns: 380px 1fr;
+        gap: 24px;
+        padding: 24px;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    form.panel {
+        background: #fff;
+        padding: 24px;
+    }
+
+    form h2 {
+        font-size: 15px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #718096;
+        margin: 20px 0 12px;
+    }
+    form h2:first-child { margin-top: 0; }
+
+    form p { margin-bottom: 14px; }
+
+    form label {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        color: #4a5568;
+        margin-bottom: 6px;
+    }
+
+    form input[type="text"],
+    form input[type="email"] {
+        width: 100%;
+        padding: 8px 10px;
+        font-size: 14px;
+        font-family: inherit;
+    }
+
+    /* Чекбокс + поле в одной строке */
+    .row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 14px;
+    }
+    .row label {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 0;
+        white-space: nowrap;
+    }
+    .row input[type="text"],
+    .row input[type="email"] {
+        flex: 1;
+        min-width: 0;
+        padding: 8px 10px;
+        font-size: 14px;
+        font-family: inherit;
+    }
+
+    /* === Раскрывающийся список цветов === */
+    details {
+        margin-bottom: 20px;
+    }
+    summary {
+        cursor: pointer;
+        padding: 8px 12px;
+        background: #f7fafc;
+        border: 1px solid #e2e8f0;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    summary .dot {
+        width: 18px;
+        height: 18px;
+        background: #667eea;
+        border: 1px solid #cbd5e0;
+        flex-shrink: 0;
+    }
+
+    ul.palette {
+        list-style: none;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 10px;
+        padding: 12px;
+        border: 1px solid #e2e8f0;
+        border-top: none;
+        background: #fff;
+    }
+
+    ul.palette li {
+        aspect-ratio: 1;
+        border: 2px solid transparent;
+        cursor: pointer;
+    }
+    ul.palette li.active { border-color: #000; }
+
+    /* === Кнопка === */
+    button#btn-apply {
+        width: 100%;
+        padding: 10px;
+        font-size: 14px;
+        font-family: inherit;
+        cursor: pointer;
+    }
+
+    /* === Сцена === */
+    main.stage {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 500px;
+        padding: 40px;
+        background:
+        repeating-linear-gradient(
+            45deg,
+            #f7fafc,
+            #f7fafc 10px,
+            #eef1f6 10px,
+            #eef1f6 20px
+        );
+    }
+
+    /* === Визитка 90×50 мм === */
+    article.card {
+        --accent: #667eea;
+
+        background: #fff;
+        width: 315px;
+        height: 175px;
+        padding: 18px 22px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        text-align: center;
+        box-shadow: 0 12px 32px rgba(26,32,44,.18);
+        overflow: hidden;
+    }
+
+    article.card h2 {
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: -0.4px;
+        line-height: 1.15;
+        color: var(--accent);
+        margin-bottom: 4px;
+        word-break: break-word;
+    }
+
+    article.card .role {
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        color: #2d3748;
+        margin-bottom: 2px;
+    }
+
+    article.card .company {
+        font-size: 11px;
+        letter-spacing: 0.4px;
+        color: #a0aec0;
+        text-transform: uppercase;
+        margin-bottom: 12px;
+    }
+
+    article.card ul.contacts {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin-top: 4px;
+    }
+
+    article.card .contact {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 12px;
+        color: #4a5568;
+        letter-spacing: 0.2px;
+    }
+
+    article.card .contact .ico {
+        width: 20px;
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        color: var(--accent);
+        flex-shrink: 0;
+    }
+
+    article.card .contact.hidden { display: none; }
+
+    main.stage > p {
+        margin-top: 20px;
+        font-size: 12px;
+        color: #a0aec0;
+        letter-spacing: .3px;
+    }
+
+    @media (max-width: 900px) {
+        .layout { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+        article.card { width: 280px; height: 156px; }
+        main.stage { padding: 24px 12px; min-height: auto; }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Конструктор визиток</h1>
+</header>
+
+<div class="layout">
+
+    <!-- ===== ФОРМА ===== -->
+    <form class="panel">
+        <h2>Данные</h2>
+
+        <p>
+        <label for="in-name">Имя и фамилия</label>
+        <input type="text" id="in-name" value="Иван Иванов" maxlength="30">
+        </p>
+
+        <p>
+        <label for="in-role">Должность</label>
+        <input type="text" id="in-role" value="Frontend-разработчик" maxlength="30">
+        </p>
+
+        <p>
+        <label for="in-company">Компания</label>
+        <input type="text" id="in-company" value="Example Inc." maxlength="30">
+        </p>
+
+        <h2>Контакты</h2>
+
+        <p class="row">
+        <label><input type="checkbox" id="chk-phone" checked> Телефон</label>
+        <input type="text" id="in-phone" value="+7 (999) 123-45-67">
+        </p>
+
+        <p class="row">
+        <label><input type="checkbox" id="chk-email" checked> Email</label>
+        <input type="email" id="in-email" value="ivan@example.com">
+        </p>
+
+        <h2>Цвет</h2>
+
+        <details>
+        <summary>
+            <span class="dot" id="color-dot"></span>
+            <span id="color-label">#667eea</span>
+        </summary>
+        <ul class="palette" id="palette">
+            <li class="active" data-color="#667eea" style="background:#667eea"></li>
+            <li data-color="#38a169" style="background:#38a169"></li>
+            <li data-color="#e53e3e" style="background:#e53e3e"></li>
+            <li data-color="#dd6b20" style="background:#dd6b20"></li>
+            <li data-color="#805ad5" style="background:#805ad5"></li>
+            <li data-color="#1a202c" style="background:#1a202c"></li>
+            <li data-color="#d53f8c" style="background:#d53f8c"></li>
+            <li data-color="#319795" style="background:#319795"></li>
+        </ul>
+        </details>
+
+        <p>
+        <button type="button" id="btn-apply">Применить</button>
+        </p>
+    </form>
+
+    <!-- Предпросмотр -->
+    <main class="stage">
+        <article class="card" id="card">
+        <h2 id="out-name">Иван Иванов</h2>
+        <p class="role" id="out-role">Frontend-разработчик</p>
+        <p class="company" id="out-company">Example Inc.</p>
+
+        <ul class="contacts">
+            <li class="contact" id="out-phone">
+            <span class="ico">☎</span>
+            <span class="txt">+7 (999) 123-45-67</span>
+            </li>
+            <li class="contact" id="out-email">
+            <span class="ico">✉</span>
+            <span class="txt">ivan@example.com</span>
+            </li>
+        </ul>
+        </article>
+    </main>
+
+</div>
+
+<script>
+const inputs = {
+    name:    document.getElementById('in-name'),
+    role:    document.getElementById('in-role'),
+    company: document.getElementById('in-company'),
+    phone:   document.getElementById('in-phone'),
+    email:   document.getElementById('in-email'),
+};
+
+const checks = {
+    phone: document.getElementById('chk-phone'),
+    email: document.getElementById('chk-email'),
+};
+
+const card = document.getElementById('card');
+const out = {
+    name:    document.getElementById('out-name'),
+    role:    document.getElementById('out-role'),
+    company: document.getElementById('out-company'),
+    phone:   document.getElementById('out-phone'),
+    email:   document.getElementById('out-email'),
+};
+
+    const colorDot   = document.getElementById('color-dot');
+    const colorLabel = document.getElementById('color-label');
+
+let accent = '#667eea';
+
+function setText(el, value) {
+    el.textContent = (value || '').trim();
+}
+
+function updateCard() {
+    setText(out.name,    inputs.name.value);
+    setText(out.role,    inputs.role.value);
+    setText(out.company, inputs.company.value);
+
+    setText(out.phone.querySelector('.txt'), inputs.phone.value);
+    setText(out.email.querySelector('.txt'), inputs.email.value);
+
+    out.phone.classList.toggle('hidden', !checks.phone.checked);
+    out.email.classList.toggle('hidden', !checks.email.checked);
+
+    applyAccent();
+}
+
+function applyAccent() {
+    card.style.setProperty('--accent', accent);
+}
+
+document.getElementById('palette').addEventListener('click', (e) => {
+    const sw = e.target.closest('li');
+    if (!sw) return;
+
+    document.querySelectorAll('#palette li').forEach(s => s.classList.remove('active'));
+    sw.classList.add('active');
+
+    accent = sw.dataset.color;
+    colorDot.style.background = accent;
+    colorLabel.textContent = accent;
+
+    applyAccent();
+});
+
+document.getElementById('btn-apply').addEventListener('click', () => {
+    updateCard();
+});
+
+updateCard();
+</script>
+</body>
+</html>
